@@ -1,4 +1,6 @@
 # battery-monitor
+[![Rust](https://github.com/BiagioFesta/battery-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/BiagioFesta/battery-monitor/actions/workflows/ci.yml)
+
 Simple service for monitoring battery and sending notifications when capacity is lower than a threshold.
 
 Typically, Linux Desktop Environments are shipped with an integrated system for battery monitoring. 
