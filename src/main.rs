@@ -109,7 +109,7 @@ struct BatteryMonitor {
 }
 
 impl BatteryMonitor {
-    const REFRESH_TIME: Duration = Duration::from_secs(1);
+    const REFRESH_TIME: Duration = Duration::from_secs(10);
 
     fn new() -> Result<Self> {
         let battery_manager = BatteryManager::new().context("Cannot create battery manager")?;
