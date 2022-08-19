@@ -1,0 +1,9 @@
+[Unit]
+Description=Battery monitoring for sending notifications
+StartLimitIntervalSec=30
+StartLimitBurst=5
+
+[Service]
+ExecStart=battery-monitor
+Restart=on-failure
+RestartSec=3s
