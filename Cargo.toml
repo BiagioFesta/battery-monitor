@@ -1,0 +1,15 @@
+[package]
+name = "battery-monitor"
+version = "0.1.0"
+license = "GPL-3.0-or-later"
+authors = ["Biagio Festa"]
+edition = "2021"
+description = "Simple service for monitoring battery status and send notifications"
+keywords = ["notification", "battery", "window-manager"]
+repository = "https://github.com/BiagioFesta/battery-monitor"
+readme = "README.md"
+
+[dependencies]
+anyhow = { version = "1.0.62", features = ["backtrace"] }
+battery = "0.7.8"
+notify-rust = "4.5.8"
