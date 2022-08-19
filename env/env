@@ -1,0 +1,15 @@
+#!/bin/sh
+
+BATTERY_MONITOR_BIN_DIR=%%%
+
+case ":${PATH}:" in
+    *:"$BATTERY_MONITOR_BIN_DIR":*)
+        ;;
+    *)
+        export PATH="$BATTERY_MONITOR_BIN_DIR:$PATH"
+        ;;
+esac
+
+# Local Variables:
+# mode: sh
+# End:
