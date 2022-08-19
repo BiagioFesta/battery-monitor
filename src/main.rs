@@ -86,7 +86,7 @@ impl ServiceState {
     ) {
         let capacity = battery.state_of_charge().value;
 
-        let _ = Notification::new()
+        let notification_result = Notification::new()
             .summary("Low Battery")
             .icon("battery")
             .urgency(urgency)
@@ -100,6 +100,10 @@ impl ServiceState {
                     .unwrap_or_default(),
             ))
             .show();
+
+        if let Err(error) = notification_result {
+            eprintln!("{:?}", error);
+        }
     }
 }
 
