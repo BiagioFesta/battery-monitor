@@ -15,11 +15,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use anyhow::Context;
 use anyhow::Result;
-use battery::Battery;
-use battery::Manager as BatteryManager;
-use battery::State as BatteryState;
+use battery_manager::Battery;
+use battery_manager::BatteryManager;
+use battery_manager::BatteryState;
 use notify_rust::Notification;
 use notify_rust::Timeout as NotificationTimeout;
 use notify_rust::Urgency as NotificationUrgency;
@@ -44,9 +43,9 @@ impl ServiceState {
     const SECS_IN_MINUTE: u64 = 60;
 
     fn next_state(&self, battery: &Battery) -> ServiceState {
-        match battery.state_of_charge().value {
-            x if x < 0.1 => ServiceState::CriticalCapacity,
-            x if x < 0.2 => ServiceState::LowCapacity,
+        match battery.percentage() {
+            x if x < 10.0 => ServiceState::CriticalCapacity,
+            x if x < 20.0 => ServiceState::LowCapacity,
             _ => ServiceState::Normal,
         }
     }
@@ -84,21 +83,30 @@ impl ServiceState {
         timeout: NotificationTimeout,
         battery: &Battery,
     ) {
-        let capacity = battery.state_of_charge().value;
+        let summary = match urgency {
+            NotificationUrgency::Critical => "Low Battery (Critical)",
+            _ => "Low Battery",
+        };
+
+        let time_to_empty = battery.time_to_empty();
+
+        let body = format!(
+            "Battery capacity is {:.0}%{rem}",
+            battery.percentage(),
+            rem = (!time_to_empty.is_zero())
+                .then(|| format!(
+                    " (remaining: {} minutes)",
+                    time_to_empty.as_secs() / Self::SECS_IN_MINUTE
+                ))
+                .unwrap_or_default()
+        );
 
         let notification_result = Notification::new()
-            .summary("Low Battery")
+            .summary(summary)
             .icon("battery")
             .urgency(urgency)
             .timeout(timeout)
-            .body(&format!(
-                "Battery capacity is {:.0}%{rem}",
-                capacity * 100_f32,
-                rem = battery
-                    .time_to_empty()
-                    .map(|time| format!(" (remaining: {:?})", time))
-                    .unwrap_or_default(),
-            ))
+            .body(&body)
             .show();
 
         if let Err(error) = notification_result {
@@ -115,8 +123,8 @@ struct BatteryMonitor {
 impl BatteryMonitor {
     const REFRESH_TIME: Duration = Duration::from_secs(10);
 
-    fn new() -> Result<Self> {
-        let battery_manager = BatteryManager::new().context("Cannot create battery manager")?;
+    async fn new() -> Result<Self> {
+        let battery_manager = BatteryManager::new().await?;
         let state = ServiceState::default();
 
         Ok(Self {
@@ -125,11 +133,11 @@ impl BatteryMonitor {
         })
     }
 
-    fn run_service(mut self) -> Result<()> {
+    async fn run_service(mut self) -> Result<()> {
         let mut last_notification_time = Instant::now();
 
         loop {
-            let batteries = self.query_batteries()?;
+            let batteries = self.battery_manager.get_batteries().await?;
 
             let is_all_discharging = batteries.iter().all(|battery| {
                 matches!(
@@ -140,8 +148,7 @@ impl BatteryMonitor {
 
             if is_all_discharging {
                 let lower_battery = batteries.iter().min_by(|b1, b2| {
-                    b1.state_of_charge()
-                        .partial_cmp(&b2.state_of_charge())
+                    PartialOrd::partial_cmp(&b1.percentage(), &b2.percentage())
                         .expect("Expect battery capacities are comparable")
                 });
 
@@ -164,16 +171,11 @@ impl BatteryMonitor {
             sleep(Self::REFRESH_TIME);
         }
     }
-
-    fn query_batteries(&self) -> Result<Vec<Battery>> {
-        self.battery_manager
-            .batteries()
-            .context("Cannot retrieve batteries information")?
-            .collect::<battery::Result<Vec<_>>>()
-            .context("Battery information is missing")
-    }
 }
 
-fn main() -> Result<()> {
-    BatteryMonitor::new()?.run_service()
+#[async_std::main]
+async fn main() -> Result<()> {
+    BatteryMonitor::new().await?.run_service().await
 }
+
+mod battery_manager;

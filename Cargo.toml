@@ -11,5 +11,6 @@ readme = "README.md"
 
 [dependencies]
 anyhow = { version = "1.0.62", features = ["backtrace"] }
-battery = "0.7.8"
+async-std = { version = "1.12.0", features = ["attributes"] }
 notify-rust = "4.5.8"
+zbus = "3.0.0"
