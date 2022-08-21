@@ -6,6 +6,10 @@ Simple service for monitoring battery and sending notifications when capacity is
 Typically, Linux Desktop Environments are shipped with an integrated system for battery monitoring. 
 However, this minimal service come handy for those environments lacking of such functionality (for instance, [i3wm](https://i3wm.org/)).
 
+<p align="center">
+<img src="imgs/monitor-battery-example.gif"/>
+</p>
+
 ## Installation
 
 ### Requirements
