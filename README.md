@@ -48,7 +48,7 @@ You can copy the binary itself and place it in the most convenient directory for
 <br>
 Afterwards, you would need a mechanism to run the service (binary) at the startup of your desktop.
 
-For example (*if you are using i3 window manager*), in your i3 configuration (generally, `~/.config/i3/config~`):
+For example (*if you are using i3 window manager*), in your i3 configuration (generally, `~/.config/i3/config`):
 
 ```
 exec --no-startup-id ~/path/to/binary/battery-monitor
