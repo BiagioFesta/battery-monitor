@@ -16,7 +16,7 @@ However, this minimal service come handy for those environments lacking of such 
 * [Rust toolchain](https://rustup.rs/).
 * [upower](https://upower.freedesktop.org/) (runtime dependency).
   * Generally an implementation of this service is already installed on the majority of the linux distributions.
-* A notifiction daemon (runtime dependency). There are many (probably you already have one of them installed on your system).
+* A notification daemon (runtime dependency). There are many (probably you already have one of them installed on your system).
   * See a list [here](https://wiki.archlinux.org/title/Desktop_notifications#Standalone).
 
 ### Compilation
